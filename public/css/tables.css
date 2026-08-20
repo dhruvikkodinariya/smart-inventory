@@ -1,0 +1,83 @@
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.table-toolbar {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.table-toolbar .form-control {
+    width: auto;
+    min-width: 200px;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.data-table th, .data-table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--card-border);
+}
+
+.data-table th {
+    background: rgba(0,0,0,0.2);
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+}
+
+.data-table tbody tr {
+    transition: var(--transition);
+}
+
+.data-table tbody tr:hover {
+    background: rgba(255,255,255,0.02);
+}
+
+.data-table td {
+    font-size: 0.9rem;
+    vertical-align: middle;
+}
+
+.table-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.empty-state {
+    padding: 3rem !important;
+    color: var(--text-secondary);
+    font-size: 1rem;
+}
+
+.split-layout {
+    display: flex;
+    gap: 2rem;
+}
+
+.split-layout > .left-col {
+    width: 35%;
+}
+
+.split-layout > .right-col {
+    width: 65%;
+}
+
+@media (max-width: 1024px) {
+    .split-layout {
+        flex-direction: column;
+    }
+    .split-layout > .left-col, .split-layout > .right-col {
+        width: 100%;
+    }
+}

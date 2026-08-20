@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notice Board — StockSense</title>
+    <meta name="description" content="StockSense Notice Board — Post and manage team announcements.">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/tables.css">
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="js/firebase-client-config.js"></script>
+    <script>firebase.initializeApp(FIREBASE_CONFIG);</script>
+</head>
+<body>
+
+    <!-- Dynamic Header -->
+    <div id="site-header"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+        <!-- StockSense Logo (inline SVG — always visible, no file loading) -->
+        <div style="display:flex;align-items:center;gap:10px;padding:1.2rem 1.25rem 1rem 1.25rem;">
+          <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="ssG" x1="0" y1="1" x2="1" y2="0">
+                <stop offset="0%" stop-color="#4f46e5"/>
+                <stop offset="100%" stop-color="#8b5cf6"/>
+              </linearGradient>
+            </defs>
+            <rect width="36" height="36" rx="9" fill="url(#ssG)"/>
+            <rect x="7"  y="21" width="5" height="8"  rx="1.5" fill="white" opacity="0.6"/>
+            <rect x="15" y="16" width="5" height="13" rx="1.5" fill="white" opacity="0.8"/>
+            <rect x="23" y="11" width="5" height="18" rx="1.5" fill="white"/>
+            <polyline points="9,19 17,13 25,8 32,4" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <polygon points="32,4 26,6 30,11" fill="white"/>
+          </svg>
+          <div style="line-height:1.2;">
+            <div style="font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:1.05rem;font-weight:700;color:#f1f5f9;letter-spacing:-0.4px;"><span style="color:#f1f5f9;">Stock</span><span style="color:#818cf8;">Sense</span></div>
+            <div style="font-size:0.58rem;font-weight:500;color:#475569;letter-spacing:1.2px;text-transform:uppercase;">Smart Inventory</div>
+          </div>
+        </div>
+        </div>
+        <div id="business-name-badge" style="
+            margin: -0.5rem 1rem 1rem 1rem; padding: 0.4rem 0.75rem;
+            background: rgba(99,102,241,0.15); border: 1px solid rgba(99,102,241,0.3);
+            border-radius: 8px; font-size: 0.75rem; color: var(--primary);
+            font-weight: 600; text-align: center; display: none;
+        ">🏢 <span id="business-name-text"></span></div>
+
+        <ul class="nav-links">
+            <li><a href="home.html" class="nav-item" data-page="home">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Home
+            </a></li>
+            <li><a href="dashboard.html" class="nav-item" data-page="dashboard">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> Dashboard
+            </a></li>
+            <li><a href="inventory.html" class="nav-item" data-page="inventory">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0020 16z"/></svg> Inventory
+            </a></li>
+            <li><a href="sales.html" class="nav-item" data-page="sales">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg> Log Sale
+            </a></li>
+            <li><a href="analytics.html" class="nav-item" data-page="analytics">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Analytics
+            </a></li>
+            <li><a href="notices.html" class="nav-item active" data-page="notices">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg> Notices
+            </a></li>
+        </ul>
+        <div class="sidebar-bottom">
+            <div class="user-info">
+                <div class="user-name" id="user-name">Loading...</div>
+                <div class="user-role" id="user-role">Role</div>
+            </div>
+            <button class="logout-btn" onclick="logout()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Logout
+            </button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="page-header">
+            <div>
+                <h1 class="page-title">📌 Notice Board</h1>
+                <p class="page-subtitle">Post announcements for your entire team. Staff can view notices on the Home page.</p>
+            </div>
+        </header>
+
+        <!-- Post a Notice (Admin/Manager only) -->
+        <div class="glass-card notice-form-card" id="post-notice-card">
+            <h3 style="font-size:1.1rem;font-weight:600;margin-bottom:1.25rem;">✏️ Post New Notice</h3>
+            <form id="post-notice-form">
+                <div class="notice-form-grid">
+                    <div class="form-group" style="grid-column:1/-1;">
+                        <label class="form-label">Notice Title <span style="color:var(--danger)">*</span></label>
+                        <input type="text" class="form-control" id="notice-title" placeholder="e.g. Store closed on Sunday" required>
+                    </div>
+                    <div class="form-group" style="grid-column:1/-1;">
+                        <label class="form-label">Message <span style="color:var(--danger)">*</span></label>
+                        <textarea class="form-control" id="notice-body" rows="3" placeholder="Write your announcement here..." required style="resize:vertical;"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Expires After (days)</label>
+                        <input type="number" class="form-control" id="notice-expiry" min="1" max="365" placeholder="e.g. 7 (leave blank = never)">
+                    </div>
+                    <div class="form-group" style="display:flex;align-items:flex-end;gap:1rem;padding-bottom:1.25rem;">
+                        <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;color:var(--text-secondary);font-size:0.9rem;">
+                            <input type="checkbox" id="notice-pinned" style="width:16px;height:16px;accent-color:var(--warning);"> 📌 Pin this notice
+                        </label>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary" id="post-notice-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                    Post Notice
+                </button>
+            </form>
+        </div>
+
+        <!-- Existing Notices -->
+        <div class="glass-card">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;">
+                <h3 style="font-size:1.1rem;font-weight:600;">Current Notices</h3>
+                <span class="badge badge-info" id="notice-count">0 notices</span>
+            </div>
+            <div class="notice-list" id="notices-list" style="max-height:none;">
+                <div class="lookup-empty">Loading notices...</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Dynamic Footer -->
+    <div id="site-footer"></div>
+
+    <script src="js/components.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/api.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        const user = JSON.parse(localStorage.getItem('stocksense_user') || '{}');
+        const role = user.role || 'Staff';
+        const isManagement = role === 'Admin' || role === 'Manager';
+
+        // Hide post form for Staff
+        if (!isManagement) {
+            const formCard = document.getElementById('post-notice-card');
+            if (formCard) formCard.style.display = 'none';
+        }
+
+        // Load notices
+        await loadNotices();
+
+        // Post notice form
+        document.getElementById('post-notice-form')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('post-notice-btn');
+            btn.disabled = true; btn.textContent = 'Posting...';
+            try {
+                await API.notices.post({
+                    title:      document.getElementById('notice-title').value.trim(),
+                    body:       document.getElementById('notice-body').value.trim(),
+                    pinned:     document.getElementById('notice-pinned').checked,
+                    expiryDays: document.getElementById('notice-expiry').value || null,
+                });
+                showToast('Notice posted successfully! 📌', 'success');
+                e.target.reset();
+                await loadNotices();
+            } catch (err) {
+                showToast(err.message || 'Failed to post notice', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Post Notice';
+            }
+        });
+
+        async function loadNotices() {
+            const container = document.getElementById('notices-list');
+            const countBadge = document.getElementById('notice-count');
+            try {
+                const { notices } = await API.notices.getAll();
+                if (!notices || notices.length === 0) {
+                    container.innerHTML = '<div class="lookup-empty">📭 No notices yet. Post the first one above!</div>';
+                    if (countBadge) countBadge.textContent = '0 notices';
+                    return;
+                }
+
+                if (countBadge) countBadge.textContent = `${notices.length} notice${notices.length !== 1 ? 's' : ''}`;
+                const sorted = notices.sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
+
+                container.innerHTML = sorted.map(n => `
+                    <div class="notice-card ${n.pinned ? 'pinned' : ''}">
+                        <div class="notice-title">${n.pinned ? '📌 ' : ''}${esc(n.title)}</div>
+                        <div class="notice-body">${esc(n.body)}</div>
+                        <div class="notice-meta">
+                            <span>Posted by ${esc(n.postedBy || 'Admin')} (${esc(n.postedByRole || '')})</span>
+                            <span>${n.createdAt ? formatDate(n.createdAt) : ''}</span>
+                            ${n.pinned ? '<span class="notice-pin-badge">Pinned</span>' : ''}
+                            ${n.expiresAt ? `<span style="color:var(--warning)">⏰ Expires ${formatDate(n.expiresAt)}</span>` : ''}
+                            ${isManagement ? `<button class="notice-delete-btn" data-id="${n.id}">🗑 Delete</button>` : ''}
+                        </div>
+                    </div>
+                `).join('');
+
+                // Delete buttons
+                container.querySelectorAll('.notice-delete-btn').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        const confirmed = await showConfirm('Delete this notice? This cannot be undone.');
+                        if (!confirmed) return;
+                        try {
+                            await API.notices.delete(btn.dataset.id);
+                            showToast('Notice deleted.', 'success');
+                            await loadNotices();
+                        } catch (err) {
+                            showToast(err.message || 'Delete failed', 'error');
+                        }
+                    });
+                });
+
+            } catch (err) {
+                container.innerHTML = '<div class="lookup-empty">Unable to load notices.</div>';
+            }
+        }
+
+        function esc(str) {
+            if (!str) return '';
+            const d = document.createElement('div');
+            d.textContent = str;
+            return d.innerHTML;
+        }
+    });
+    </script>
+</body>
+</html>

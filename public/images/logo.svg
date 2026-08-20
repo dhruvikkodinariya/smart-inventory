@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 52" width="220" height="52" fill="none">
+  <defs>
+    <linearGradient id="iconGrad" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#6366f1"/>
+    </linearGradient>
+    <linearGradient id="arrowGrad" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#a78bfa"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Bar chart columns -->
+  <rect x="4"  y="34" width="7" height="12" rx="2" fill="url(#iconGrad)" opacity="0.7"/>
+  <rect x="14" y="26" width="7" height="20" rx="2" fill="url(#iconGrad)" opacity="0.85"/>
+  <rect x="24" y="18" width="7" height="28" rx="2" fill="url(#iconGrad)"/>
+
+  <!-- Upward arrow -->
+  <polyline points="6,28 16,20 26,12 36,4" stroke="url(#arrowGrad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <polygon points="36,4 27,6 34,13" fill="url(#arrowGrad)"/>
+
+  <!-- "Stock" text -->
+  <text x="48" y="34"
+        font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+        font-size="22"
+        font-weight="700"
+        fill="#f1f5f9"
+        letter-spacing="-0.5">Stock</text>
+
+  <!-- "Sense" text -->
+  <text x="116" y="34"
+        font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+        font-size="22"
+        font-weight="400"
+        fill="#94a3b8"
+        letter-spacing="-0.3">Sense</text>
+</svg>

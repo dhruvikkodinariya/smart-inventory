@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — StockSense</title>
+    <meta name="description" content="StockSense Dashboard — Real-time inventory overview, dead stock alerts, and sales trends.">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="js/firebase-client-config.js"></script>
+    <script>firebase.initializeApp(FIREBASE_CONFIG);</script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+</head>
+<body>
+
+    <!-- Dynamic Header -->
+    <div id="site-header"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+        <!-- StockSense Logo (inline SVG — always visible, no file loading) -->
+        <div style="display:flex;align-items:center;gap:10px;padding:1.2rem 1.25rem 1rem 1.25rem;">
+          <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="ssG" x1="0" y1="1" x2="1" y2="0">
+                <stop offset="0%" stop-color="#4f46e5"/>
+                <stop offset="100%" stop-color="#8b5cf6"/>
+              </linearGradient>
+            </defs>
+            <rect width="36" height="36" rx="9" fill="url(#ssG)"/>
+            <rect x="7"  y="21" width="5" height="8"  rx="1.5" fill="white" opacity="0.6"/>
+            <rect x="15" y="16" width="5" height="13" rx="1.5" fill="white" opacity="0.8"/>
+            <rect x="23" y="11" width="5" height="18" rx="1.5" fill="white"/>
+            <polyline points="9,19 17,13 25,8 32,4" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <polygon points="32,4 26,6 30,11" fill="white"/>
+          </svg>
+          <div style="line-height:1.2;">
+            <div style="font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:1.05rem;font-weight:700;color:#f1f5f9;letter-spacing:-0.4px;"><span style="color:#f1f5f9;">Stock</span><span style="color:#818cf8;">Sense</span></div>
+            <div style="font-size:0.58rem;font-weight:500;color:#475569;letter-spacing:1.2px;text-transform:uppercase;">Smart Inventory</div>
+          </div>
+        </div>
+        </div>
+        <div id="business-name-badge" style="
+            margin: -0.5rem 1rem 1rem 1rem;
+            padding: 0.4rem 0.75rem;
+            background: rgba(99,102,241,0.15);
+            border: 1px solid rgba(99,102,241,0.3);
+            border-radius: 8px;
+            font-size: 0.75rem;
+            color: var(--primary);
+            font-weight: 600;
+            text-align: center;
+            display: none;
+        ">🏢 <span id="business-name-text"></span></div>
+        <ul class="nav-links">
+            <li><a href="home.html" class="nav-item" data-page="home">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Home
+            </a></li>
+            <li><a href="dashboard.html" class="nav-item" data-page="dashboard">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg> Dashboard
+            </a></li>
+            <li><a href="inventory.html" class="nav-item" data-page="inventory">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0020 16z"></path></svg> Inventory
+            </a></li>
+            <li><a href="sales.html" class="nav-item" data-page="sales">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"></path></svg> Log Sale
+            </a></li>
+            <li><a href="analytics.html" class="nav-item" data-page="analytics">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg> Analytics
+            </a></li>
+            <li><a href="notices.html" class="nav-item" data-page="notices">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg> Notices
+            </a></li>
+        </ul>
+        <div class="sidebar-bottom">
+            <div class="user-info">
+                <div class="user-name" id="user-name">Loading...</div>
+                <div class="user-role" id="user-role">Role</div>
+            </div>
+            <button class="logout-btn" onclick="logout()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg> Logout
+            </button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="page-header">
+            <div>
+                <h1 class="page-title">Dashboard</h1>
+                <p class="page-subtitle" id="current-date"></p>
+                <script>document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-GB', {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'})</script>
+            </div>
+            <button class="btn btn-outline" id="seed-btn" style="display: none;">Seed Demo Data</button>
+        </header>
+
+        <div class="stats-grid">
+            <div class="glass-card stat-card blue">
+                <div class="stat-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg></div>
+                <div class="stat-details">
+                    <div class="stat-label">Total Products</div>
+                    <div class="stat-value" id="stat-total-products">0</div>
+                </div>
+            </div>
+            <div class="glass-card stat-card green">
+                <div class="stat-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg></div>
+                <div class="stat-details">
+                    <div class="stat-label">Total Inventory Value</div>
+                    <div class="stat-value" id="stat-inventory-value">₹0</div>
+                </div>
+            </div>
+            <div class="glass-card stat-card red">
+                <div class="stat-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></div>
+                <div class="stat-details">
+                    <div class="stat-label">Capital in Dead Stock</div>
+                    <div class="stat-value text-danger" id="stat-dead-stock-value">₹0</div>
+                </div>
+            </div>
+            <div class="glass-card stat-card orange">
+                <div class="stat-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg></div>
+                <div class="stat-details">
+                    <div class="stat-label">Low Stock Alerts</div>
+                    <div class="stat-value" id="stat-low-stock">0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="charts-grid">
+            <div class="glass-card chart-card dead-stock-card">
+                <div class="chart-header">
+                    <h3 class="chart-title">Top Dead Stock Items (Capital Locked)</h3>
+                </div>
+                <div id="dead-stock-chart" class="chart-container"></div>
+            </div>
+            <div class="glass-card chart-card">
+                <div class="chart-header">
+                    <h3 class="chart-title">Stock by Category</h3>
+                </div>
+                <div id="category-chart" class="chart-container"></div>
+            </div>
+            <div class="glass-card chart-card chart-row-full">
+                <div class="chart-header">
+                    <h3 class="chart-title">Monthly Sales Trend</h3>
+                </div>
+                <div id="sales-trend-chart" class="chart-container"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Dynamic Footer -->
+    <div id="site-footer"></div>
+
+    <script src="js/components.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>
