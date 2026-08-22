@@ -22,8 +22,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function loadData() {
         try {
-            deadData = await API.analytics.deadStock();
-            lowData = await API.analytics.lowStock();
+            const deadRes = await API.analytics.deadStock();
+            const lowRes  = await API.analytics.lowStock();
+
+            deadData = deadRes.deadStock || [];
+            lowData  = lowRes.lowStock   || [];
 
             // Populate summary cards
             const totalDead = document.getElementById('stat-total-dead');
@@ -41,8 +44,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 } else {
                     deadTable.innerHTML = deadData.sort((a,b) => b.daysInactive - a.daysInactive).map(item => `
                         <tr>
-                            <td>${item.productName}</td>
-                            <td>${item.category}</td>
+                            <td>${item.productName || 'Unknown'}</td>
+                            <td>${item.categoryName || item.category || '—'}</td>
                             <td>${item.currentStock}</td>
                             <td><span class="badge ${item.daysInactive > 120 ? 'badge-danger' : 'badge-warning'}">${item.daysInactive} days</span></td>
                             <td>${formatCurrency(item.costPrice)}</td>
@@ -59,8 +62,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 } else {
                     lowTable.innerHTML = lowData.map(item => `
                         <tr>
-                            <td>${item.name}</td>
-                            <td>${item.category}</td>
+                            <td>${item.productName || item.name || 'Unknown'}</td>
+                            <td>${item.categoryName || item.category || '—'}</td>
                             <td>${item.currentStock}</td>
                             <td>${item.reorderLevel}</td>
                             <td class="text-danger font-weight-bold">${item.currentStock - item.reorderLevel}</td>
@@ -80,7 +83,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ['Product', 'Category', 'Stock Qty', 'Days Inactive', 'Cost Price', 'Capital Locked']
             ];
             deadData.forEach(item => {
-                rows.push([item.productName, item.category, item.currentStock, item.daysInactive, item.costPrice, item.capitalLocked]);
+                rows.push([item.productName || 'Unknown', item.categoryName || item.category || '', item.currentStock, item.daysInactive, item.costPrice, item.capitalLocked]);
             });
             exportCSV('dead_stock_report.csv', rows);
         });
@@ -92,7 +95,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ['Product', 'Category', 'Current Stock', 'Reorder Level', 'Shortage']
             ];
             lowData.forEach(item => {
-                rows.push([item.name, item.category, item.currentStock, item.reorderLevel, item.currentStock - item.reorderLevel]);
+                rows.push([item.productName || item.name || 'Unknown', item.categoryName || item.category || '', item.currentStock, item.reorderLevel, item.currentStock - item.reorderLevel]);
             });
             exportCSV('low_stock_report.csv', rows);
         });

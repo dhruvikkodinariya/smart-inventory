@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
             products = await API.products.getAll();
             if (productSelect) {
                 productSelect.innerHTML = '<option value="">Select Product...</option>' + 
-                    products.map(p => `<option value="${p.id}">${p.name} (Stock: ${p.currentStock})</option>`).join('');
+                    products.map(p => `<option value="${p.id}">${p.productName || p.name || 'Unknown'} (Stock: ${p.currentStock ?? 0})</option>`).join('');
             }
             loadRecentSales();
         } catch(e) {
@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
         productSelect.addEventListener('change', (e) => {
             currentSelectedProduct = products.find(p => p.id === e.target.value);
             if (currentSelectedProduct) {
-                stockDisplay.textContent = currentSelectedProduct.currentStock;
+                stockDisplay.textContent = currentSelectedProduct.currentStock ?? 0;
                 qtyInput.max = currentSelectedProduct.currentStock;
                 qtyInput.value = '';
                 totalDisplay.textContent = '₹0';
@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     e.target.value = qty;
                     showToast('Cannot sell more than current stock', 'warning');
                 }
-                totalDisplay.textContent = formatCurrency(qty * currentSelectedProduct.unitPrice);
+                totalDisplay.textContent = formatCurrency(qty * (currentSelectedProduct.unitPrice || 0));
             } else {
                 totalDisplay.textContent = '₹0';
             }
