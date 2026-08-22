@@ -226,4 +226,40 @@ router.post('/login', async (req, res, next) => {
   }
 });
 
+// ── PUT /profile — Update user profile (name, photoURL) ──────────────────
+router.put('/profile', async (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader?.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const token = authHeader.split(' ')[1];
+    const decoded = await auth.verifyIdToken(token);
+    const uid = decoded.uid;
+
+    const { photoURL, name } = req.body;
+
+    // Validate base64 image size (max ~3MB after decoding)
+    if (photoURL && photoURL.length > 4 * 1024 * 1024) {
+      return res.status(413).json({ error: 'Image too large. Please use a smaller photo.' });
+    }
+
+    const updates = {};
+    if (photoURL !== undefined) updates.photoURL = photoURL;
+    if (name && name.trim())    updates.name = name.trim();
+
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({ error: 'Nothing to update.' });
+    }
+
+    await db.collection('users').doc(uid).update(updates);
+
+    // Return updated user data
+    const userDoc = await db.collection('users').doc(uid).get();
+    res.json({ message: 'Profile updated', user: userDoc.data() });
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = router;

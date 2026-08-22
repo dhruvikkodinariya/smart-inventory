@@ -95,15 +95,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 recentTable.innerHTML = '<tr><td colspan="5" class="text-center empty-state">No recent sales.</td></tr>';
                 return;
             }
-            recentTable.innerHTML = sales.slice(0, 20).map(s => `
+            recentTable.innerHTML = sales.slice(0, 20).map(s => {
+                const qty  = s.quantitySold ?? s.quantity ?? 0;
+                const date = s.transactionDate || s.date;
+                const by   = s.soldByName || s.loggedBy || 'System';
+                return `
                 <tr>
-                    <td>${s.productName || 'Unknown Product'}</td>
-                    <td>${s.quantity}</td>
+                    <td>${s.productName || s.productId || 'Unknown Product'}</td>
+                    <td>${qty}</td>
                     <td>${formatCurrency(s.totalAmount)}</td>
-                    <td>${formatDate(s.date)}</td>
-                    <td>${s.loggedBy || 'System'}</td>
-                </tr>
-            `).join('');
+                    <td>${formatDate(date)}</td>
+                    <td>${by}</td>
+                </tr>`;
+            }).join('');
         } catch(err) {
             recentTable.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Error loading sales data</td></tr>';
         }

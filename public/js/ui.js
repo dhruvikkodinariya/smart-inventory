@@ -145,7 +145,17 @@ function formatCurrency(amount) {
 
 function formatDate(timestamp) {
     if (!timestamp) return '-';
-    const date = timestamp.seconds ? new Date(timestamp.seconds * 1000) : new Date(timestamp);
+    let date;
+    if (timestamp._seconds !== undefined) {
+        // Firestore Admin SDK serializes as { _seconds, _nanoseconds }
+        date = new Date(timestamp._seconds * 1000);
+    } else if (timestamp.seconds !== undefined) {
+        // Firestore client SDK uses { seconds, nanoseconds }
+        date = new Date(timestamp.seconds * 1000);
+    } else {
+        date = new Date(timestamp);
+    }
+    if (isNaN(date.getTime())) return '-';
     return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 

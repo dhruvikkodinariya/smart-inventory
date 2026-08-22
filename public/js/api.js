@@ -58,8 +58,9 @@ async function apiFetch(endpoint, options = {}) {
 // ─── API Methods ───────────────────────────────────────────────────────────
 const API = {
   auth: {
-    register: (data) => apiFetch('/api/auth/register', { method: 'POST', body: JSON.stringify(data) }),
-    login:    (data) => apiFetch('/api/auth/login',    { method: 'POST', body: JSON.stringify(data) })
+    register:      (data) => apiFetch('/api/auth/register', { method: 'POST', body: JSON.stringify(data) }),
+    login:         (data) => apiFetch('/api/auth/login',    { method: 'POST', body: JSON.stringify(data) }),
+    updateProfile: (data) => apiFetch('/api/auth/profile',  { method: 'PUT',  body: JSON.stringify(data) })
   },
   products: {
     getAll:  (params) => apiFetch('/api/products' + (params ? '?' + new URLSearchParams(params) : '')),

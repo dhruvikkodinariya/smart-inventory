@@ -99,8 +99,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         const matches = allProducts.filter(p =>
-            (p.name || '').toLowerCase().includes(query) ||
-            (p.category || '').toLowerCase().includes(query)
+            (p.productName || p.name || '').toLowerCase().includes(query) ||
+            (p.categoryName || p.category || '').toLowerCase().includes(query)
         ).slice(0, 10);
 
         if (matches.length === 0) {
@@ -116,8 +116,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             return `
                 <div class="lookup-item">
                     <div>
-                        <div class="lookup-item-name">${escHtml(p.name)}</div>
-                        <div class="lookup-item-cat">${escHtml(p.category || '—')}</div>
+                        <div class="lookup-item-name">${escHtml(p.productName || p.name || '—')}</div>
+                        <div class="lookup-item-cat">${escHtml(p.categoryName || p.category || '—')}</div>
                     </div>
                     <div style="text-align:right">
                         <div class="lookup-item-stock" style="color:${stockColor}">${stock}</div>
@@ -140,11 +140,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // ── Shift Summary (today's sales by this user) ─────────────────────────
     try {
-        const { sales } = await API.sales.getAll();
+        // API.sales.getAll() returns a raw array from the server
+        const salesResp = await API.sales.getAll();
+        const sales = Array.isArray(salesResp) ? salesResp : (salesResp.sales || []);
         const today = new Date().toDateString();
-        const todaySales = (sales || []).filter(s => {
-            const d = s.date?.seconds ? new Date(s.date.seconds * 1000) : new Date(s.date);
-            return d.toDateString() === today && (s.loggedByUid === user.uid || s.uid === user.uid);
+        const todaySales = sales.filter(s => {
+            // Firestore Admin SDK serializes Timestamps as { _seconds, _nanoseconds }
+            const ts = s.transactionDate || s.date;
+            let d;
+            if (ts?._seconds !== undefined)      d = new Date(ts._seconds * 1000);
+            else if (ts?.seconds !== undefined)  d = new Date(ts.seconds * 1000);
+            else                                 d = new Date(ts);
+            return d.toDateString() === today &&
+                   (s.soldBy === user.uid || s.loggedByUid === user.uid || s.uid === user.uid);
         });
 
         const count  = todaySales.length;
