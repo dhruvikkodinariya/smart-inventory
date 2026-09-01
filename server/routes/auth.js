@@ -143,8 +143,8 @@ router.post('/register', async (req, res, next) => {
       });
     }
 
-    // ── MANAGER or STAFF: Joins existing business using Join Code ─────────
-    if (role === 'Manager' || role === 'Staff') {
+    // ── MANAGER: Joins existing business using Join Code ─────────────────
+    if (role === 'Manager') {
       if (!joinCode || !joinCode.trim()) {
         return res.status(400).json({ error: 'Business Join Code is required to join a business.' });
       }
@@ -186,7 +186,7 @@ router.post('/register', async (req, res, next) => {
       });
     }
 
-    return res.status(400).json({ error: 'Role must be Admin, Manager, or Staff.' });
+    return res.status(400).json({ error: 'Role must be Admin or Manager.' });
 
   } catch (error) {
     next(error);

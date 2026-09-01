@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', async () => {
     const user = JSON.parse(localStorage.getItem('stocksense_user') || '{}');
-    const role = user.role || 'Staff';
+    const role = user.role || 'Manager';
     const name = user.name || 'User';
     const businessName = localStorage.getItem('stocksense_businessName') || 'Your Business';
 

@@ -188,12 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Refresh branding before redirect
             if (typeof refreshBranding === 'function') refreshBranding();
 
-            // Route based on role
-            if (data.user.role === 'Staff') {
-                window.location.href = 'home.html';
-            } else {
-                window.location.href = 'dashboard.html';
-            }
+            window.location.href = 'dashboard.html';
         } catch (err) {
             showToast(err.message || 'Login failed', 'error');
             btn.disabled = false; btn.textContent = 'Sign In';
@@ -249,18 +244,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (role === 'Admin' && data.joinCode) {
                 showToast(`✅ Business created! Your Join Code: ${data.joinCode}`, 'success');
                 setTimeout(() => {
-                    alert(`✅ Business Created!\n\nYour Business Join Code:\n\n🔑 ${data.joinCode}\n\nShare this with your Managers and Staff so they can join.`);
+                    alert(`✅ Business Created!\n\nYour Business Join Code:\n\n🔑 ${data.joinCode}\n\nShare this with your Managers so they can join.`);
                     window.location.href = 'dashboard.html';
                 }, 800);
                 return;
             }
 
-            // Route by role
-            if (role === 'Staff') {
-                window.location.href = 'home.html';
-            } else {
-                window.location.href = 'dashboard.html';
-            }
+            window.location.href = 'dashboard.html';
         } catch (err) {
             showToast(err.message || 'Registration failed', 'error');
             submitBtn.disabled = false; submitBtn.textContent = 'Create Account';

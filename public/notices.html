@@ -83,7 +83,7 @@
         <header class="page-header">
             <div>
                 <h1 class="page-title">📌 Notice Board</h1>
-                <p class="page-subtitle">Post announcements for your entire team. Staff can view notices on the Home page.</p>
+                <p class="page-subtitle">Post announcements for your entire team. Team members can view notices on the Home page.</p>
             </div>
         </header>
 
@@ -138,10 +138,10 @@
     <script>
     document.addEventListener('DOMContentLoaded', async () => {
         const user = JSON.parse(localStorage.getItem('stocksense_user') || '{}');
-        const role = user.role || 'Staff';
+        const role = user.role || 'Manager';
         const isManagement = role === 'Admin' || role === 'Manager';
 
-        // Hide post form for Staff
+        // Hide post form for non-management roles
         if (!isManagement) {
             const formCard = document.getElementById('post-notice-card');
             if (formCard) formCard.style.display = 'none';

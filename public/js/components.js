@@ -100,7 +100,6 @@ compStyles.innerHTML = `
 
 #site-header .header-role-badge.admin   { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.2); }
 #site-header .header-role-badge.manager { background: rgba(59,130,246,0.15); color: #60a5fa; border: 1px solid rgba(59,130,246,0.2); }
-#site-header .header-role-badge.staff   { background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.2); }
 
 #site-header .header-date {
   font-size: 0.75rem;
@@ -431,7 +430,7 @@ function renderHeader() {
     if (!isNaN(d.getTime())) memberSince = d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
   }
 
-  const roleColors = { admin: '#f87171', manager: '#60a5fa', staff: '#34d399' };
+  const roleColors = { admin: '#f87171', manager: '#60a5fa' };
   const roleColor  = roleColors[roleLower] || '#94a3b8';
 
   // Big avatar in dropdown: photo or initial + camera overlay

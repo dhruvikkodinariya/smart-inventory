@@ -182,12 +182,7 @@ function checkAuth() {
     if (!token && !isAuthPage) {
         window.location.href = 'index.html';
     } else if (token && isAuthPage) {
-        // Redirect based on role
-        if (user.role === 'Staff') {
-            window.location.href = 'home.html';
-        } else {
-            window.location.href = 'dashboard.html';
-        }
+        window.location.href = 'dashboard.html';
     }
 }
 
